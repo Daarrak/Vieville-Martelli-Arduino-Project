@@ -1,7 +1,7 @@
 projet de fou  :
 CAHIER DES CHARGES : 
 
--pouvoir se déplacer facilement et rapidement 
+-pouvoir se déplacer rapidement 
 
 -pouvoir électrocuter 
 
