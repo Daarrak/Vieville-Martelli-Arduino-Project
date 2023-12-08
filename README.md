@@ -3,7 +3,7 @@ CAHIER DES CHARGES :
 
 -pouvoir se déplacer rapidement 
 
--pouvoir électrocuter 
+-pouvoir électrocuter avec un avertissement sonore
 
 -détecter les objets de couleurs 
 
