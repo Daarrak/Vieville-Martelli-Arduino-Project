@@ -1,4 +1,3 @@
-projet de fou  :
 CAHIER DES CHARGES : 
 
 -pouvoir se déplacer rapidement 
