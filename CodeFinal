@@ -1,0 +1,195 @@
+//Libraries
+#include <Adafruit_NeoPixel.h>
+
+//Variables
+int buzzer=A0;
+int trig=2;
+int echo=8;
+float lecture_echo;
+float dis;
+
+int x=A5;
+int bloc=A4;
+
+int taz=0;
+int tourne=0;
+
+// MOTEUR A
+int ENA=9; // 9 pour sortie PWM
+int IN1=13;
+int IN2=5;
+
+// MOTEUR B
+int ENB=10; // 10 pour sortie PWM
+int IN3=6;
+int IN4=7;
+
+int LED=12;
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(6, LED, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+ 	Serial.begin(19200);
+  pinMode(buzzer,OUTPUT);
+  pinMode(trig,OUTPUT);
+  pinMode(echo,INPUT);
+  pinMode(ENA,OUTPUT);
+  pinMode(ENB,OUTPUT);
+  pinMode(IN1,OUTPUT);
+  pinMode(IN2,OUTPUT);  
+  pinMode(IN3,OUTPUT);
+  pinMode(IN4,OUTPUT);
+  pinMode(x,INPUT);
+  pinMode(bloc,INPUT);
+
+// Direction du Moteur droit
+  digitalWrite(IN1,HIGH);  
+  digitalWrite(IN2,LOW);
+
+// Direction du Moteur gauche
+  digitalWrite(IN3,HIGH);
+  digitalWrite(IN4,LOW);
+
+// Met les 2 moteurs à l'arrêt
+  stop();
+
+  strip.begin();
+  strip.show(); // Initialise toute les led à 'off'
+
+  delay(3000);
+}
+
+void loop() {
+  testPixy();
+}
+
+float distance(){
+  digitalWrite(trig,1);
+  delayMicroseconds(10);
+  digitalWrite(trig,0);
+  lecture_echo=pulseIn(echo, 1)*0.017;
+  return lecture_echo;
+}
+
+void seek(int lecture_echo){
+  if(lecture_echo<15){
+    back(100,100);
+  }
+  else if(lecture_echo<22) {
+    tourne++;
+    if(tourne>2){
+      stop();
+      tone(buzzer, 1000, 100);
+      delay(200);
+      tone(buzzer, 3000, 100);
+        delay(1800);
+      turnRight(100,100);
+      delay(500);
+      stop();
+      delay(800);
+    }
+  }
+  else {
+    tourne=0;
+    forward(110,120);
+  }
+}
+
+void testPixy() {
+  dis=distance();
+  if (dis>8 && digitalRead(bloc)==1){
+    taz=0;
+    tourne=0;
+ 		if (analogRead(x)<325){
+      // Tourne le véhicule à gauche pour centrer l'objet
+      forward(150,254);
+    }
+    else if (analogRead(x)>390){
+      // Tourne le véhicule à droite pour centrer l'objet
+      forward(254,150);
+    }
+    else{
+      forward(110,120);
+    }
+ 	}
+  else if (digitalRead(bloc)==0){
+    taz=0;
+    seek(dis);
+  }
+  else {
+    taz++;
+    if(taz>4){
+      tazer();
+    }
+  }
+}
+
+void tazer(){
+  stop();
+  for(int j=0 ; j<83 ; j++){
+    tone(buzzer, 1800, 45);
+    for(int i = 0; i < 6; i++ ) { // On fait une boucle pour définir la couleur de chaque led
+        // setPixelColor(n° de led, Rouge, Vert, Bleu)
+        strip.setPixelColor(i, 0, 0, 223);    
+    }
+    strip.show();
+    delay(30);
+    for(int i = 0; i < 6; i++ ) { // On fait une boucle pour définir la couleur de chaque led
+        // setPixelColor(n° de led, Rouge, Vert, Bleu)
+        strip.setPixelColor(i, 0, 0, 0);       
+    }
+    strip.show(); // on affiche 
+    delay(30);
+  }
+  turnRight(100,100);
+  delay(700);
+  stop();
+  delay(800);
+}
+ 	
+
+void stop(){
+  digitalWrite(IN1,HIGH);  
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,HIGH);
+  digitalWrite(IN4,LOW);
+  analogWrite(ENA,0);
+  analogWrite(ENB,0);
+}
+
+void forward(int left,int right){
+  digitalWrite(IN1,HIGH);  
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,HIGH);
+  digitalWrite(IN4,LOW);
+  analogWrite(ENA,right);
+  analogWrite(ENB,left);
+}
+
+void turnRight(int left,int right){
+  digitalWrite(IN1,LOW);  
+  digitalWrite(IN2,HIGH);
+  digitalWrite(IN3,HIGH);
+  digitalWrite(IN4,LOW);
+  analogWrite(ENA,right);
+  analogWrite(ENB,left);
+}
+
+void turnLeft(int left,int right){
+  digitalWrite(IN1,HIGH);  
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,HIGH);
+  analogWrite(ENA,right);
+  analogWrite(ENB,left);
+}
+
+void back(int left,int right){
+  digitalWrite(IN1,LOW);  
+  digitalWrite(IN2,HIGH);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,HIGH);
+  analogWrite(ENA,right);
+  analogWrite(ENB,left);
+}
+
+
